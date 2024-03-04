@@ -62,6 +62,29 @@ function [31:0] Or (input [31:0] A, B);
 	end
 endfunction
 
+function [31:0] Neg (input [31:0] A);
+	reg [31:0] newReg;
+	
+	begin
+		newReg = ~A + 1;
+		Neg = newReg;
+	end
+endfunction
+
+function [31:0] Not (input [31:0] A);
+	reg [31:0] newReg;
+	integer i;
+	
+	begin
+		for (i = 0; i < 32; i = i + 1) begin
+			if (A[i] == 0)
+				newReg[i] = 1;
+			else
+				newReg[i] = 0;
+		end
+		Not = newReg;
+	end
+endfunction
 
 function [31:0] CLA (input [31:0] A, B);
 	
