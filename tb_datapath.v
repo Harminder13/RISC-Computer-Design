@@ -336,69 +336,83 @@ always @(PresentState) begin
 		end
 		
 		Reg_load1a: begin
-			$display("Loading value");
-			MdataIn <= 32'h00000022;
-			
-			MDRead = 0; 
-			MDRIn = 0; 		// the first zero is there for completeness
-			reset <= 0;		// stop Clearing regs
-			MDRead<= 1; 		//Setup MDRMux
 			#15;
+			$display("Loading value");
+			MdataIn <= 32'b1100;
+			MDRead <= 1; 		//Setup MDRMux
 			MDRIn <= 1;
-			#5;
+			
+			#25;
+			MDRead <= 0; 
+			MDRIn <= 0;
+			
 		end
 
 		Reg_load1b: begin
-			#5;
-			MDRead<= 0; 
-			MDRIn <= 0;				//Stop old sigs
+			#15;
 			MDROut <= 1; 			//Send from MDR
 			MDRSelect <= 1;		//Select MDR as bus source
 			R2In <= 1;				//Enable R2
+			
+			#25;
+			MDROut <= 0;
+			MDRSelect <= 0;
+			R2In <= 0;
+			
 		end
 
 		Reg_load2a: begin
-			#5;
-			MDROut <= 0; 
-			R2In <= 0;  
-			MDRSelect <=0;						//Reset old sigs
-			MdataIn <= 32'h00000024;		//Load new val
-			MDRead<= 1; 						//Setup MDRMux
-			#10;
+			#15;
+			MdataIn <= 32'b100;		//Load new val
+			MDRead<= 1; 		
 			MDRIn <= 1;
-			#5;
+			
+			#25;
+			MDRead<= 0; 
+			MDRIn <= 0;
+			
 		end
 		
 		Reg_load2b: begin
-			#5;
-			MDRead <= 0;
-			MDRIn <= 0;					//Stop old sigs
-			MDROut <= 1; 				//Send from MDR
-			MDRSelect <= 1;			//Select MDR as bus source
-			R4In <= 1;					//Enable R4
+			#15;
+			MDROut <= 1; 			//Send from MDR
+			MDRSelect <= 1;		//Select MDR as bus source
+			R3In <= 1;
+			
+			#25;
+			MDROut <= 0;
+			MDRSelect <= 0;
+			R3In <= 0;
+			
 		end
 
 		Reg_load3a: begin
-			#10;
-			R4In <= 0; 
-			MDRSelect <= 0; 
-			MDROut <= 0;
-			MdataIn <= 32'h00000026;
-			MDRead <= 1; 					//Setup MDRMux
-			#5;
+			#15;
+			MdataIn <= 32'b1000;		//Load new val
+			MDRead<= 1; 		
 			MDRIn <= 1;
+			
+			#25;
+			MDRead<= 0; 
+			MDRIn <= 0;
+			
 		end
 
 		Reg_load3b: begin
-			#10;
-			MDRead <= 0; 
-			MDRIn <= 0;					//Stop old sigs
-			MDROut <= 1; 				//Send from MDR
-			MDRSelect <= 1;			//Select MDR as bus source
-			R5In <= 1;					//Enable R5
+			#15;
+			MDROut <= 1; 			//Send from MDR
+			MDRSelect <= 1;		//Select MDR as bus source
+			R4In <= 1;
+			
+			#25;
+			MDROut <= 0;
+			MDRSelect <= 0;
+			R4In <= 0;
+			
 		end
 
-		T0: begin // see if you need to de-assert these signals
+		T0: begin // see if you need to de-assert these signals 1000
+			#15;
 			R5In <= 0; 
 			MDRSelect <=0;
 			PCOut <= 0; 
@@ -408,42 +422,72 @@ always @(PresentState) begin
 		end
 
 		T1: begin
-			ZLowOut <= 1; 
-			PCIn <= 1; 
+			#15;
+			MdataIn <= 32'h4A920000; // opcode for
 			MDRead <= 1; 
 			MDRIn <= 1;
-			MdataIn <= 32'h4A920000; // opcode for
+			
+			#25;
+			MDRead<= 0; 
+			MDRIn <= 0;
+			
+			ZLowOut <= 1; 
+			PCIn <= 1; 
+			
 		end
 
 		T2: begin
+			#15;
+			MDROut <= 1; 
+			ZLowOut <= 1; 
+			PCIn <= 1; 
+			IRIn <= 1;
+			
+			#25;
+			MDROut <= 0; 
 			ZLowOut <= 0;
 			PCIn <= 0;
-			MDRead <= 0;
-			MDRIn <= 0;
-			MDROut <= 1; 
-			IRIn <= 1;
+			IRIn <= 0;
 		end
 
 		T3: begin
-			MDROut <= 0; 
+			#15;
 			R2Select <= 1;  
-			RYIn <= 1; 		//AND <= 0100;
+			RYIn <= 1; 
+			
+			#25;
+			R2Select <= 0;  
+			RYIn <= 0;
+			
 		end
 
 		T4: begin
-			RYIn <= 0; 
-			R2Select <= 0; 
-			R4Out <= 1; 
-			R4Select <= 1; 
-			ALUcontrol <= 4'b0010; 
-			RZIn <= 1;
+			#15;
+			ALUcontrol <= 4'b0010; //div
+			R3Out <= 1; 
+			R3Select <= 1; 
+			
+			ZLowIn <= 1; 
+			
+			#25;
+			R3Out <= 0; 
+			R3Select <= 0; 
+			
+			ZLowIn <= 0; 
+			
 		end
 
 		T5: begin
-			R4Select <= 0; 
+			#15;
 			ZLowSelect <= 1; 
-			ZLowOut <=1; 
+			ZLowOut <= 1; 
 			R5In <= 1;
+			
+			#25;
+			ZLowSelect <= 0;
+			ZLowOut <= 0; 
+			R5In <= 0;
+			
 		end
 
 	endcase
