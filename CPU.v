@@ -297,13 +297,13 @@ Register LOW(
 	.output_Q(LOWOutput_Q)
 );
 
-Register MDR(
-	.clk(clk),
-	.clr(reset),
-	.W_E(MDRIn),
-	.input_D(BusMuxOut),
-	.output_Q(MDROutput_Q)
-);
+//Register MDR(
+//	.clk(clk),
+//	.clr(reset),
+//	.W_E(MDRIn),
+//	.input_D(BusMuxOut),
+//	.output_Q(MDROutput_Q)
+//);
 
 
 //other elements
@@ -388,7 +388,7 @@ MDR TheMDR(
 	.MDataIn(MdataIn),
 	.MDRead(MDRead),
 	.MDRIn(MDRIn),
-	.Q(BusMuxOut)
+	.Q(MDROutput_Q)
 );
 
 ALU TheALU(
