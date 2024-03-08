@@ -6,7 +6,7 @@ module MAR(
 	input wire[31:0] BusMuxOut, 
 	  
 
-	output reg[8:0] Address
+	output reg[8:0] AddressOut
 );
 
 always @(posedge clk) begin 
