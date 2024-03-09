@@ -8,7 +8,7 @@ module ALU (
 
 reg[63:0] big;
 	
-always @(Op) begin
+always @(Op, A, B) begin
 	case (Op)
 		4'b0001: alu_out = CLA (A, B);
 		4'b0010: alu_out = subtract (A, B);
@@ -16,12 +16,15 @@ always @(Op) begin
 		big = Div(A,B);
 			alu_out = big[31:0];
 			alu_out2 = big[63:32];
+			
 		end
 		
 		4'b0100: begin
 			big = Mul(A,B);
 			alu_out = big[31:0];
 			alu_out2 = big[63:32];
+			
+			alu_out = Mul(A, B);
 		end
 		
 		4'b0101: alu_out = And (A, B);
@@ -32,7 +35,7 @@ always @(Op) begin
 		4'b1010: alu_out = RotateRight (A);
 		4'b1011: alu_out = RotateLeft (A);
 
-		default alu_out = 1'bz;
+		default alu_out = 32'bz;
 	endcase
 end
 
@@ -204,33 +207,31 @@ function [31:0] RotateLeft (input [31:0] unrotated);
 endfunction
 
 // Multiplicant= A , Multiplier= B
-function [63:0] Mul (input [31:0] A, B);
+function [63:0] Mul (input [31:0] A, input [31:0] B);
 
-	reg signed [63:0] product_reg;         
-	reg signed [31:0] recoded_multiplier; 
-	reg signed [63:0] extended_multiplicand;
+	reg signed[63:0] product_reg;         
+	reg signed[31:0] recoded_multiplier; 
+	reg signed[63:0] extended_multiplicand;
 
 	
-	integer prdouct_reg;
 	integer counter;
 	begin
 	
-	prdouct_reg=0;
-	counter= 0;
+	counter = 0;
 	
 	extended_multiplicand = {{32{A[31]}}, A};
 	
-	while (counter<32) begin 
+	while(counter < 32) begin 
 	
-		case ({B[counter], (counter == 0) ? B[0] : B[counter-1]})
+		case({B[counter], (counter == 0) ? B[0] : B[counter-1]})
 			2'b11: recoded_multiplier[counter] = 0;   // no adjustment
 			2'b10: recoded_multiplier[counter] = 1;   // +1 adjustment
 			2'b01: recoded_multiplier[counter] = -1;  // -1 adjustment
 			2'b00: recoded_multiplier[counter] = 0;   // no adjustment
 		endcase
 
-		case (recoded_multiplier[counter])
-			1: product_reg = product_reg + extended_multiplicand; // Addition
+		case(recoded_multiplier[counter])
+			 1: product_reg = product_reg + extended_multiplicand; // Addition
 			-1: product_reg = product_reg - extended_multiplicand; // Subtraction
 			default: ; // No adjustment
 		endcase
@@ -239,41 +240,49 @@ function [63:0] Mul (input [31:0] A, B);
 		counter = counter + 1;
 	end
 	counter = 0; 
-	Mul = product_reg[63:0];  
+	Mul = product_reg[31:0];  
 	end
 endfunction
 
 
 // dividend= A , divisor= B
-function [63:0] Div (input [31:0] A, B);
+function [64:0] Div (input [31:0] A, B);
 	reg [31:0] C;
 	reg [31:0] M;
 	reg [31:0] Q;
 	reg [31:0] quotient;
 	reg [31:0] remainder;
 	
+	
 	integer counter;
 	begin
 	counter=32;
 	
+	C = 32'b0;
 	M =B;
 	Q =A;
 	
 	while (counter > 0) begin
 		// Shift left {C, Q}, (This value will be updated immediately)
-		{C, Q} = {C, Q} << 1; 
+		
+		C = C << 1;
+		C[0] = Q[31];
+		Q= Q << 1;
+		
+		//{C, Q} = {C, Q} << 1; 
+		
 		// C = C - M, (This value will be updated immediately)
 		C = C - M;             
             
 		// Check sign bit of C
 		if (C[31] == 0) begin    
 			// Set least significant bit (LSB) of Q as 0
-			Q[0] = 1'b0;
+			Q[0] = 1'b1;
 		end 
 			
 		else if (C[31] == 1) begin
 			// Set LSB of Q as 1, and restore C
-			Q[0] = 1'b1;
+			Q[0] = 1'b0;
 			// (This value will be updated immediately)
 			C = C + M;
 		end
@@ -286,7 +295,7 @@ function [63:0] Div (input [31:0] A, B);
 	remainder = C; 
 
 			
-	Div= {remainder, quotient};
+	Div = {remainder, quotient};
 	end
 endfunction 
 endmodule
