@@ -285,7 +285,7 @@ Register HI(
 	.clk(clk),
 	.clr(reset),
 	.W_E(HIIn),
-	.input_D(BusMuxOut),
+	.input_D(ZHighOutput_Q),
 	.output_Q(HIOutput_Q)
 );
 
@@ -293,7 +293,7 @@ Register LOW(
 	.clk(clk),
 	.clr(reset),
 	.W_E(LOWIn),
-	.input_D(BusMuxOut),
+	.input_D(ZLowOutput_Q),
 	.output_Q(LOWOutput_Q)
 );
 
@@ -393,7 +393,7 @@ MDR TheMDR(
 
 ALU TheALU(
 	.A(BusMuxOut),
-	.B(BusMuxOut),
+	.B(RYOutput_Q),
 	.Op(ALUcontrol),
 	.alu_out(ZLowOutput_Q),
 	.alu_out2(ZHighOutput_Q)
