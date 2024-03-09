@@ -22,5 +22,4 @@ module Reg0 (
 		busMuxIn <= (~BAout && output_Q);
 		
 	end
-
 endmodule
