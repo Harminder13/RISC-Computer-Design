@@ -1,7 +1,7 @@
 module ALU (
 	input wire[31:0] A,
 	input wire[31:0] B,
-	input wire[31:0] Op,
+	input wire[3:0] Op,
 	output reg[31:0] alu_out,
 	output reg[31:0] alu_out2
 );
@@ -10,27 +10,27 @@ reg[63:0] big;
 	
 always @(Op) begin
 	case (Op)
-		4'b0000: alu_out = CLA (A, B);
-		4'b0001: alu_out = subtract (A, B);
-		4'b0010: begin
+		4'b0001: alu_out = CLA (A, B);
+		4'b0010: alu_out = subtract (A, B);
+		4'b0011: begin
 		big = Div(A,B);
 			alu_out = big[31:0];
 			alu_out2 = big[63:32];
 		end
 		
-		4'b0011: begin
+		4'b0100: begin
 			big = Mul(A,B);
 			alu_out = big[31:0];
 			alu_out2 = big[63:32];
 		end
 		
-		4'b0100: alu_out = And (A, B);
-		4'b0101: alu_out = Or (A, B);
-		4'b0110: alu_out = LogicalRightShift (A);
-		4'b0111: alu_out = ArithmeticRightShift (A);
-		4'b1000: alu_out = LeftShift (A);
-		4'b1001: alu_out = RotateRight (A);
-		4'b1010: alu_out = RotateLeft (A);
+		4'b0101: alu_out = And (A, B);
+		4'b0110: alu_out = Or (A, B);
+		4'b0111: alu_out = LogicalRightShift (A);
+		4'b1000: alu_out = ArithmeticRightShift (A);
+		4'b1001: alu_out = LeftShift (A);
+		4'b1010: alu_out = RotateRight (A);
+		4'b1011: alu_out = RotateLeft (A);
 
 		default alu_out = 1'bz;
 	endcase
@@ -250,8 +250,7 @@ function [63:0] Div (input [31:0] A, B);
 	reg [31:0] M;
 	reg [31:0] Q;
 	reg [31:0] quotient;
-	reg [31:0] remainder; 
-	reg [31:0] n;
+	reg [31:0] remainder;
 	
 	integer counter;
 	begin
@@ -272,7 +271,7 @@ function [63:0] Div (input [31:0] A, B);
 			Q[0] = 1'b0;
 		end 
 			
-		else begin
+		else if (C[31] == 1) begin
 			// Set LSB of Q as 1, and restore C
 			Q[0] = 1'b1;
 			// (This value will be updated immediately)
@@ -285,16 +284,9 @@ function [63:0] Div (input [31:0] A, B);
 	// Result is in Q, and remainder is in C
 	quotient = Q;
 	remainder = C; 
+
 			
-	C = 32'b0;
-	Q = A;
-	M = B;
-	n = 5'b1;  
-	quotient = 32'b0;
-	remainder = 32'b0;
-			
-	Div= {quotient[31:0], remainder[31:0]};
+	Div= {remainder, quotient};
 	end
 endfunction 
 endmodule
-
