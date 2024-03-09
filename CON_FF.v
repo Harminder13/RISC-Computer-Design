@@ -29,7 +29,6 @@ module CON_FF (
 		);
 		
 	end
-	
 endmodule
 
 
@@ -69,7 +68,6 @@ function Nor32Bit (input [31:0] input32);
 		Nor32Bit = ~result;
 
 	end
-	
 endfunction
 
 
@@ -78,5 +76,4 @@ module DFlipFlop(input D,input clk, output Q);
 	always @ (posedge clk) begin
 		Q <= D; 
 	end 
-
 endmodule 
