@@ -1,6 +1,7 @@
 `timescale 1ns/10ps
 module tb_datapath;
 	reg clk;
+	reg clk10;
 	reg reset;
 	
 	
@@ -199,14 +200,23 @@ integer i;
 // add test logic here
 initial begin
 	clk = 0;
+	clk10 = 0;
 	for(i = 0; i < 250; i = i + 1) begin
 		#10 clk = ~clk;
+		
+		if(i % 10 == 0) begin
+			clk10 = ~clk10;
+		end
 	end
+	
+	
 end
 
 
+
+
 // finite state machine; if clk rising-edge
-always @(posedge clk) begin
+always @(posedge clk10) begin
 	case(PresentState)
 		Reg_load1a : PresentState = Reg_load1b;
 		Reg_load1b : PresentState = Reg_load2a;
@@ -338,7 +348,7 @@ always @(PresentState) begin
 		Reg_load1a: begin
 			#15;
 			$display("Loading value");
-			MdataIn <= 32'b1100;
+			MdataIn <= 32'b0100;
 			MDRead <= 1; 		//Setup MDRMux
 			MDRIn <= 1;
 			
@@ -363,7 +373,7 @@ always @(PresentState) begin
 
 		Reg_load2a: begin
 			#15;
-			MdataIn <= 32'b100;		//Load new val
+			MdataIn <= 32'b1100;		//Load new val
 			MDRead<= 1; 		
 			MDRIn <= 1;
 			
@@ -463,17 +473,20 @@ always @(PresentState) begin
 
 		T4: begin
 			#15;
-			ALUcontrol <= 4'b0010; //div
 			R3Out <= 1; 
 			R3Select <= 1; 
 			
+			#15;
+			ALUcontrol <= 4'b0011; //op code
 			ZLowIn <= 1; 
+			ZHighIn <= 1; 
 			
-			#25;
+			#45;
 			R3Out <= 0; 
 			R3Select <= 0; 
 			
 			ZLowIn <= 0; 
+			ZHighIn <= 0; 
 			
 		end
 
