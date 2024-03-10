@@ -23,8 +23,6 @@ always @(Op, A, B) begin
 			big = Mul(A,B);
 			alu_out = big[31:0];
 			alu_out2 = big[63:32];
-			
-			alu_out = Mul(A, B);
 		end
 		
 		4'b0101: alu_out = And (A, B);
@@ -207,92 +205,77 @@ function [31:0] RotateLeft (input [31:0] unrotated);
 endfunction
 
 // Multiplicant= A , Multiplier= B
-function [63:0] Mul (input [31:0] A, input [31:0] B);
+function signed [63:0] Mul(input signed [31:0] A, B);
+    reg signed [63:0] accumulator;   
+    reg signed [31:0] Multiplier; 
+    reg AuxiliaryBit;                
+    reg [5:0] Count;         
+    reg signed [63:0] SignExtendedOperand;
+	 
+	 begin
+    SignExtendedOperand = {{32{A[31]}}, A};
+    accumulator = 0;
+    Multiplier = B;
+    AuxiliaryBit = 0;
+    Count = 0;
 
-	reg signed[63:0] product_reg;         
-	reg signed[31:0] recoded_multiplier; 
-	reg signed[63:0] extended_multiplicand;
+    while (Count < 32) begin
+       
+        case ({Multiplier[0], AuxiliaryBit})
+            2'b01: accumulator = accumulator + SignExtendedOperand;
+            2'b10: accumulator = accumulator - SignExtendedOperand;
+            default: ; // No operation for other cases
+        endcase
 
-	
-	integer counter;
-	begin
-	
-	counter = 0;
-	
-	extended_multiplicand = {{32{A[31]}}, A};
-	
-	while(counter < 32) begin 
-	
-		case({B[counter], (counter == 0) ? B[0] : B[counter-1]})
-			2'b11: recoded_multiplier[counter] = 0;   // no adjustment
-			2'b10: recoded_multiplier[counter] = 1;   // +1 adjustment
-			2'b01: recoded_multiplier[counter] = -1;  // -1 adjustment
-			2'b00: recoded_multiplier[counter] = 0;   // no adjustment
-		endcase
+        // Arithmetic right shift
+        {accumulator, Multiplier, AuxiliaryBit} = {accumulator[63], accumulator, Multiplier, AuxiliaryBit} >> 1;
 
-		case(recoded_multiplier[counter])
-			 1: product_reg = product_reg + extended_multiplicand; // Addition
-			-1: product_reg = product_reg - extended_multiplicand; // Subtraction
-			default: ; // No adjustment
-		endcase
+        Count = Count + 1;
+    end
+	 
+	 accumulator= {accumulator [31:0],Multiplier};
 	
-		product_reg = product_reg >>> 1;
-		counter = counter + 1;
-	end
-	counter = 0; 
-	Mul = product_reg[31:0];  
-	end
+    Mul = accumulator;
+	 
+	 end
 endfunction
 
 
 // dividend= A , divisor= B
-function [64:0] Div (input [31:0] A, B);
-	reg [31:0] C;
+function [64:0] Div (input signed [31:0] A, B);
+	reg [31:0] accumulator;
 	reg [31:0] M;
 	reg [31:0] Q;
 	reg [31:0] quotient;
 	reg [31:0] remainder;
 	
 	
-	integer counter;
+	integer Count;
 	begin
-	counter=32;
 	
-	C = 32'b0;
+	Count=0;
+	accumulator = 32'b0;
 	M =B;
 	Q =A;
 	
-	while (counter > 0) begin
-		// Shift left {C, Q}, (This value will be updated immediately)
+	while (Count <32) begin
 		
-		C = C << 1;
-		C[0] = Q[31];
-		Q= Q << 1;
-		
-		//{C, Q} = {C, Q} << 1; 
-		
-		// C = C - M, (This value will be updated immediately)
-		C = C - M;             
+		{accumulator,Q} = {accumulator,Q} << 1;
+		accumulator = accumulator - M;             
             
-		// Check sign bit of C
-		if (C[31] == 0) begin    
-			// Set least significant bit (LSB) of Q as 0
-			Q[0] = 1'b1;
+		if (accumulator[31] == 0) begin    
+			Q[0] = 1;
 		end 
 			
-		else if (C[31] == 1) begin
-			// Set LSB of Q as 1, and restore C
-			Q[0] = 1'b0;
-			// (This value will be updated immediately)
-			C = C + M;
+		else if (accumulator[31] == 1) begin
+			Q[0] = 0;
+			accumulator = accumulator + M;
 		end
-			
-		// Decrement count
-		counter = counter - 1;
+	
+		Count = Count + 1;
 	end
-	// Result is in Q, and remainder is in C
 	quotient = Q;
-	remainder = C; 
+	remainder = accumulator; 
 
 			
 	Div = {remainder, quotient};
