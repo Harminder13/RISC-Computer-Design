@@ -131,13 +131,16 @@ function [31:0] subtract (input [31:0] A, B);
 	end
 endfunction
 
-function [31:0] LogicalRightShift (input [31:0] unshifted);
+function [31:0] LogicalRightShift (input [31:0] unshifted, input N);
 	
 	reg[31:0] shifted;
 	integer i;
+	integer j;
 	begin
-		for (i = 0; i < 31; i = i + 1) begin
-			shifted [i] = unshifted [i + 1];
+		for (j = 0; j < N; j  = j + 1) begin
+			for (i = 0; i < 31; i = i + 1) begin
+				shifted [i] = unshifted [i + 1];
+			end
 		end
 		shifted [31] = 0;
 		LogicalRightShift = shifted;
@@ -145,14 +148,16 @@ function [31:0] LogicalRightShift (input [31:0] unshifted);
 endfunction
 
 
-function [31:0] ArithmeticRightShift (input [31:0] unshifted);
+function [31:0] ArithmeticRightShift (input [31:0] unshifted, input N);
 	
 	reg[31:0] shifted;
 	integer i;
-	
+	integer j;
 	begin
-		for (i = 0; i < 31; i = i + 1) begin
-			shifted [i] = unshifted [i + 1];
+		for (j = 0; j < N; j = j + 1) begin
+			for (i = 0; i < 31; i = i + 1) begin
+				shifted [i] = unshifted [i + 1];
+			end
 		end
 		shifted [31] = unshifted [31];
 		ArithmeticRightShift = shifted;
@@ -160,13 +165,16 @@ function [31:0] ArithmeticRightShift (input [31:0] unshifted);
 endfunction
 
 
-function [31:0] LeftShift (input [31:0] unshifted);
+function [31:0] LeftShift (input [31:0] unshifted, input N);
 
-   reg[31:0] shifted;
+   	reg[31:0] shifted;
 	integer i;
+	integer j;
 	begin
-		for (i = 1; i < 32; i = i + 1) begin
-			shifted [i] = unshifted [i - 1];
+		for (j = 0; j < N; j = j + 1) begin
+			for (i = 1; i < 32; i = i + 1) begin
+				shifted [i] = unshifted [i - 1];
+			end
 		end
 		shifted [0] = 0;
 		LeftShift = shifted;
@@ -174,14 +182,15 @@ function [31:0] LeftShift (input [31:0] unshifted);
 endfunction
 
 
-function [31:0] RotateRight (input [31:0] unrotated);
+function [31:0] RotateRight (input [31:0] unrotated, input N);
 	integer i;
+	integer j;
 	reg[31:0] rotated;
-	
 	begin
-		
-		for (i = 0; i < 31; i = i + 1) begin
-			rotated [i] = unrotated [i + 1];
+		for (j = 0; j < N; j = j + 1) begin
+			for (i = 0; i < 31; i = i + 1) begin
+				rotated [i] = unrotated [i + 1];
+			end
 		end
 		rotated [31] = unrotated [0];
 		RotateRight = rotated;
@@ -189,15 +198,16 @@ function [31:0] RotateRight (input [31:0] unrotated);
 endfunction
 
 
-function [31:0] RotateLeft (input [31:0] unrotated);
+function [31:0] RotateLeft (input [31:0] unrotated, input N);
 	
 	reg[31:0] rotated;
 	integer i;
-	
+	integer j;
 	begin
-	
-		for (i = 1; i < 32; i = i + 1) begin
-			rotated [i] = unrotated [i - 1];
+		for (j = 0; j < N; j = j + 1) begin
+			for (i = 1; i < 32; i = i + 1) begin
+				rotated [i] = unrotated [i - 1];
+			end
 		end
 		rotated [0] = unrotated [31];
 		RotateLeft = rotated;
