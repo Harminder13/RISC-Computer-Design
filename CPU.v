@@ -110,6 +110,9 @@ module CPU(
 	wire[31:0] MDMuxOutput_Q;
 	
 	wire[31:0] toRZ;
+	
+	wire[31:0] ZLowInput;
+	wire[31:0] ZHighInput;
 
 //Registers
 
@@ -285,7 +288,7 @@ Register HI(
 	.clk(clk),
 	.clr(reset),
 	.W_E(HIIn),
-	.input_D(ZHighOutput_Q),
+	.input_D(ZHighInput),
 	.output_Q(HIOutput_Q)
 );
 
@@ -293,7 +296,7 @@ Register LOW(
 	.clk(clk),
 	.clr(reset),
 	.W_E(LOWIn),
-	.input_D(ZLowOutput_Q),
+	.input_D(ZLowInput),
 	.output_Q(LOWOutput_Q)
 );
 
@@ -395,8 +398,8 @@ ALU TheALU(
 	.A(BusMuxOut),
 	.B(RYOutput_Q),
 	.Op(ALUcontrol),
-	.alu_out(ZLowOutput_Q),
-	.alu_out2(ZHighOutput_Q)
+	.alu_out(ZLowInput),
+	.alu_out2(ZHighInput)
 );
 
 
