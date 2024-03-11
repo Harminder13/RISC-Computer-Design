@@ -348,7 +348,7 @@ always @(PresentState) begin
 		Reg_load1a: begin
 			#15;
 			$display("Loading value");
-			MdataIn <= 32'b0100;
+			MdataIn <= 10;
 			MDRead <= 1; 		//Setup MDRMux
 			MDRIn <= 1;
 			
@@ -362,18 +362,18 @@ always @(PresentState) begin
 			#15;
 			MDROut <= 1; 			//Send from MDR
 			MDRSelect <= 1;		//Select MDR as bus source
-			R2In <= 1;				//Enable R2
+			R1In <= 1;				//Enable R2
 			
 			#25;
 			MDROut <= 0;
 			MDRSelect <= 0;
-			R2In <= 0;
+			R1In <= 0;
 			
 		end
 
 		Reg_load2a: begin
 			#15;
-			MdataIn <= 32'b1100;		//Load new val
+			MdataIn <= 7;		//Load new val
 			MDRead<= 1; 		
 			MDRIn <= 1;
 			
@@ -387,18 +387,18 @@ always @(PresentState) begin
 			#15;
 			MDROut <= 1; 			//Send from MDR
 			MDRSelect <= 1;		//Select MDR as bus source
-			R3In <= 1;
+			R2In <= 1;
 			
 			#25;
 			MDROut <= 0;
 			MDRSelect <= 0;
-			R3In <= 0;
+			R2In <= 0;
 			
 		end
 
 		Reg_load3a: begin
 			#15;
-			MdataIn <= 32'b1000;		//Load new val
+			MdataIn <= 32'b0100;		//Load new val
 			MDRead<= 1; 		
 			MDRIn <= 1;
 			
@@ -412,18 +412,18 @@ always @(PresentState) begin
 			#15;
 			MDROut <= 1; 			//Send from MDR
 			MDRSelect <= 1;		//Select MDR as bus source
-			R4In <= 1;
+			R6In <= 1;
 			
 			#25;
 			MDROut <= 0;
 			MDRSelect <= 0;
-			R4In <= 0;
+			R6In <= 0;
 			
 		end
 
 		T0: begin // see if you need to de-assert these signals 1000
 			#15;
-			R5In <= 0; 
+			R7In <= 0; 
 			MDRSelect <=0;
 			PCOut <= 0; 
 			MARIn <= 0; 
@@ -473,33 +473,33 @@ always @(PresentState) begin
 
 		T4: begin
 			#15;
-			R3Out <= 1; 
-			R3Select <= 1; 
+			R1Out <= 1; 
+			R1Select <= 1; 
 			
 			#15;
-			ALUcontrol <= 4'b0011; //op code
-			ZLowIn <= 1; 
-			ZHighIn <= 1; 
+			ALUcontrol <= 4'b0010; //op code
+			LOWIn <= 1; 
+			HIIn <= 1; 
 			
 			#45;
-			R3Out <= 0; 
-			R3Select <= 0; 
+			R1Out <= 0; 
+			R1Select <= 0; 
 			
-			ZLowIn <= 0; 
-			ZHighIn <= 0; 
+			LOWIn <= 0; 
+			HIIn <= 0; 
 			
 		end
 
 		T5: begin
 			#15;
-			ZLowSelect <= 1; 
-			ZLowOut <= 1; 
-			R5In <= 1;
+			LOWSelect <= 1; 
+			LOWOut <= 1; 
+			R3In <= 1;
 			
 			#25;
-			ZLowSelect <= 0;
-			ZLowOut <= 0; 
-			R5In <= 0;
+			LOWSelect <= 0;
+			LOWOut <= 0; 
+			R3In <= 0;
 			
 		end
 
