@@ -131,7 +131,7 @@ function [31:0] subtract (input [31:0] A, B);
 	end
 endfunction
 
-function [31:0] LogicalRightShift (input [31:0] unshifted, input N);
+function [31:0] LogicalRightShift (input [31:0] unshifted, N);
 	
 	reg[31:0] shifted;
 	integer i;
@@ -148,7 +148,7 @@ function [31:0] LogicalRightShift (input [31:0] unshifted, input N);
 endfunction
 
 
-function [31:0] ArithmeticRightShift (input [31:0] unshifted, input N);
+function [31:0] ArithmeticRightShift (input [31:0] unshifted, N);
 	
 	reg[31:0] shifted;
 	integer i;
@@ -165,7 +165,7 @@ function [31:0] ArithmeticRightShift (input [31:0] unshifted, input N);
 endfunction
 
 
-function [31:0] LeftShift (input [31:0] unshifted, input N);
+function [31:0] LeftShift (input [31:0] unshifted, N);
 
    	reg[31:0] shifted;
 	integer i;
@@ -182,7 +182,7 @@ function [31:0] LeftShift (input [31:0] unshifted, input N);
 endfunction
 
 
-function [31:0] RotateRight (input [31:0] unrotated, input N);
+function [31:0] RotateRight (input [31:0] unrotated, N);
 	integer i;
 	integer j;
 	reg[31:0] rotated;
@@ -198,7 +198,7 @@ function [31:0] RotateRight (input [31:0] unrotated, input N);
 endfunction
 
 
-function [31:0] RotateLeft (input [31:0] unrotated, input N);
+function [31:0] RotateLeft (input [31:0] unrotated, N);
 	
 	reg[31:0] rotated;
 	integer i;
