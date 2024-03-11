@@ -32,6 +32,8 @@ always @(Op, A, B) begin
 		4'b1001: alu_out = LeftShift (A);
 		4'b1010: alu_out = RotateRight (A);
 		4'b1011: alu_out = RotateLeft (A);
+		4'b1100: alu_out = Neg (A);
+		4'b1101: alu_out = Not (A);
 
 		default alu_out = 32'bz;
 	endcase
@@ -131,16 +133,13 @@ function [31:0] subtract (input [31:0] A, B);
 	end
 endfunction
 
-function [31:0] LogicalRightShift (input [31:0] unshifted, N);
+function [31:0] LogicalRightShift (input [31:0] unshifted);
 	
 	reg[31:0] shifted;
 	integer i;
-	integer j;
 	begin
-		for (j = 0; j < N; j  = j + 1) begin
-			for (i = 0; i < 31; i = i + 1) begin
-				shifted [i] = unshifted [i + 1];
-			end
+		for (i = 0; i < 31; i = i + 1) begin
+			shifted [i] = unshifted [i + 1];
 		end
 		shifted [31] = 0;
 		LogicalRightShift = shifted;
@@ -148,16 +147,14 @@ function [31:0] LogicalRightShift (input [31:0] unshifted, N);
 endfunction
 
 
-function [31:0] ArithmeticRightShift (input [31:0] unshifted, N);
+function [31:0] ArithmeticRightShift (input [31:0] unshifted);
 	
 	reg[31:0] shifted;
 	integer i;
-	integer j;
+	
 	begin
-		for (j = 0; j < N; j = j + 1) begin
-			for (i = 0; i < 31; i = i + 1) begin
-				shifted [i] = unshifted [i + 1];
-			end
+		for (i = 0; i < 31; i = i + 1) begin
+			shifted [i] = unshifted [i + 1];
 		end
 		shifted [31] = unshifted [31];
 		ArithmeticRightShift = shifted;
@@ -165,16 +162,13 @@ function [31:0] ArithmeticRightShift (input [31:0] unshifted, N);
 endfunction
 
 
-function [31:0] LeftShift (input [31:0] unshifted, N);
+function [31:0] LeftShift (input [31:0] unshifted);
 
-   	reg[31:0] shifted;
+   reg[31:0] shifted;
 	integer i;
-	integer j;
 	begin
-		for (j = 0; j < N; j = j + 1) begin
-			for (i = 1; i < 32; i = i + 1) begin
-				shifted [i] = unshifted [i - 1];
-			end
+		for (i = 1; i < 32; i = i + 1) begin
+			shifted [i] = unshifted [i - 1];
 		end
 		shifted [0] = 0;
 		LeftShift = shifted;
@@ -182,15 +176,14 @@ function [31:0] LeftShift (input [31:0] unshifted, N);
 endfunction
 
 
-function [31:0] RotateRight (input [31:0] unrotated, N);
+function [31:0] RotateRight (input [31:0] unrotated);
 	integer i;
-	integer j;
 	reg[31:0] rotated;
+	
 	begin
-		for (j = 0; j < N; j = j + 1) begin
-			for (i = 0; i < 31; i = i + 1) begin
-				rotated [i] = unrotated [i + 1];
-			end
+		
+		for (i = 0; i < 31; i = i + 1) begin
+			rotated [i] = unrotated [i + 1];
 		end
 		rotated [31] = unrotated [0];
 		RotateRight = rotated;
@@ -198,16 +191,15 @@ function [31:0] RotateRight (input [31:0] unrotated, N);
 endfunction
 
 
-function [31:0] RotateLeft (input [31:0] unrotated, N);
+function [31:0] RotateLeft (input [31:0] unrotated);
 	
 	reg[31:0] rotated;
 	integer i;
-	integer j;
+	
 	begin
-		for (j = 0; j < N; j = j + 1) begin
-			for (i = 1; i < 32; i = i + 1) begin
-				rotated [i] = unrotated [i - 1];
-			end
+	
+		for (i = 1; i < 32; i = i + 1) begin
+			rotated [i] = unrotated [i - 1];
 		end
 		rotated [0] = unrotated [31];
 		RotateLeft = rotated;
@@ -268,6 +260,9 @@ function [64:0] Div (input signed [31:0] A, B);
 	M =B;
 	Q =A;
 	
+	if (M[31]) M=~B +1;
+	if (Q[31]) Q=~A +1;
+	
 	while (Count <32) begin
 		
 		{accumulator,Q} = {accumulator,Q} << 1;
@@ -284,10 +279,20 @@ function [64:0] Div (input signed [31:0] A, B);
 	
 		Count = Count + 1;
 	end
-	quotient = Q;
-	remainder = accumulator; 
-
-			
+	
+	if (A[31] & B[31]) begin
+	quotient= Q ;	
+	remainder= accumulator;
+	end
+	else if (A[31] | B[31]) begin
+	quotient= ~Q +1 ;	
+	remainder= ~accumulator +1 ;
+	end
+	else begin
+	quotient= Q;	
+	remainder= accumulator;
+	end
+	
 	Div = {remainder, quotient};
 	end
 endfunction 
