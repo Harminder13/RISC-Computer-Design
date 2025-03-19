@@ -33,3 +33,7 @@ This project involves the design, simulation, implementation, and verification o
   ✅ Arithmetic and Logic Operations  
 
 ---
+### 📄 **License**  
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.  
+
+---
