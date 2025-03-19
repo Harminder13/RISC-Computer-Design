@@ -1,4 +1,3 @@
-Here’s a polished GitHub description for your **ELEC374 CPU Project**:
 
 # 💻 **ELEC374 CPU Project – SimpleRISC Computer (Mini SRC)**  
 
